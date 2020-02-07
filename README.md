@@ -6,8 +6,8 @@ gpg --import privKey.asc
 minikube start
 
 # Step 3
-helmfile diff
-helmfile apply
+1. helmfile diff
+2. helmfile apply
 
 # Step 4 
 minikube service list
@@ -15,5 +15,5 @@ minikube service list
 find jenkins and open it in your beerrrowserrrrr
 
 # Additional
-helm secreds dec secrets.yaml to decrypt secrets
-yaml.dec are ignored in git, there are also commithooks to prevent acccidental commits of these.
+1. helm secreds dec secrets.yaml to decrypt secrets
+2. yaml.dec are ignored in git, there are also commithooks to prevent acccidental commits of these.
