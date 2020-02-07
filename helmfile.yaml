@@ -1,0 +1,80 @@
+repositories:
+# To use official "stable" charts a.k.a https://github.com/helm/charts/tree/master/stable
+- name: stable
+  url: https://kubernetes-charts.storage.googleapis.com
+# To use official "incubator" charts a.k.a https://github.com/helm/charts/tree/master/incubator
+- name: incubator
+  url: https://kubernetes-charts-incubator.storage.googleapis.com
+# helm-git powered repository: You can treat any Git repository as a charts repository
+# - name: nginx-stable 
+#   url: https://helm.nginx.com/stable
+
+# - name: loki
+#   url: https://grafana.github.io/loki/charts
+
+
+releases:
+  - name: metrics-server
+    chart: stable/metrics-server
+    version: 2.9.0
+    namespace: kube-system
+    values:
+      - image:
+          tag: v0.3.2
+  - name: jenkins
+    chart: stable/jenkins
+    version: 1.9.16
+    namespace: demo
+    values:
+      - persistence:
+          enabled: false
+      - master:
+          nodePort: 32600
+          serviceType: NodePort
+          resources:
+              requests:
+                cpu: "50m"
+                memory: "256Mi"
+              limits:
+                cpu: "500m"
+                memory: "4096Mi"      
+          adminUser: {{  .Environment.Values.CUSTOM_ADMIN }}
+          adminPassword:  {{ .Environment.Values.CUSTOM_PASSWORD }}
+          JCasC:
+            enabled: true
+            defaultConfig: false
+            pluginVersion: "1.35"
+            # it's only used when plugin version is <=1.18 for later version the
+            # configuration as code support plugin is no longer needed
+            # supportPluginVersion: "1.18"
+            configScripts:
+              scripts: |
+                jenkins:
+                  systemMessage: "Welcome to our server i2-jenkins.  This Jenkins is configured and managed 'as code'."          
+                credentials:
+                        system:
+                          domainCredentials:
+                              - credentials:
+                                - usernamePassword:
+                                    scope: SYSTEM
+                                    id: sudo_password
+                                    username: {{  .Environment.Values.SSH_USERNAME }}
+                                    password: {{  .Environment.Values.SSH_KEY }}
+                                    description: "Just a test, not actually in use!!! values are: {{  .Environment.Values.SSH_USERNAME }} {{  .Environment.Values.SSH_KEY }}"                  
+                                - basicSSHUserPrivateKey:
+                                    scope: "GLOBAL"
+                                    id: "bitbucket-greier"
+                                    username: {{  .Environment.Values.SSH_USERNAME }}
+                                    passphrase: ""
+                                    description: "Deploy key for global shared library"
+                                    privateKeySource:
+                                      directEntry:
+                                        privateKey: {{  .Environment.Values.SSH_KEY }}
+
+environments:
+  default:
+    values:
+      - values.yaml
+    secrets:
+      - secrets.yaml
+      - jcasc-secrets.yaml
