@@ -10,9 +10,8 @@ minikube start
 2. helmfile apply
 
 # Step 4 
-minikube service list
-
-find jenkins and open it in your beerrrowserrrrr
+1. minikube service list
+2. find jenkins and open it in your beerrrowserrrrr
 
 # Additional
 1. helm secreds dec secrets.yaml to decrypt secrets
